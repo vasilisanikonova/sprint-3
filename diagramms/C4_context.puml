@@ -1,0 +1,21 @@
+@startuml
+title Теплый дом диаграмма контекста AsIs
+
+!include <C4/C4_Container>
+!theme aws-orange
+LAYOUT_LANDSCAPE()
+Person(user, "Пользователь", "Пользователь системы Теплый дом")
+
+Container_Boundary(HeatingHomeMonolith, "Система Теплый дом"){
+    Container_Boundary(ControlDomain, "Домен: управление устройствами"){
+            System(HeatSubDomain, "Поддомен: Управление оборудованием", "Включение, выключение")
+            System(MonitoringSubDomain, "Поддомен: Мониторинг температуры", "Мониторинг температуры")
+    }
+}
+System_Ext(HeatingSystem, "Устройства отопления", "Управляемое оборудование")
+System_Ext(TemperatureSensor, "Телеметрия", "Датчики температуры")
+
+Rel(user, HeatingHomeMonolith, "Обращение к системе")
+Rel(HeatSubDomain,HeatingSystem,"Управление устройствами отопления")
+Rel(MonitoringSubDomain,TemperatureSensor,"Обработка показаний температуры")
+@enduml
