@@ -1,0 +1,99 @@
+@startuml
+title Теплый дом. Экосистема C4 containers diagramm
+
+!include <C4/C4_Container>
+!theme crt-amber
+
+Person(user, "Пользователь", "Пользователь системы Теплый дом. Экосистема")
+System(SmartHomeSystem, "Теплый дом. Экосистема")
+
+Container_Boundary(SmartHomeSystem, "Smart Home") {
+  Container(WebApp, "Web Application", "Java, Spring", "Веб-приложение")
+  Container(Kafka, "Message broker", "Kafka", "Брокер сообщений")
+
+  Container_Boundary(Users, "Users"){
+    Container(UsersService, "Сервис управления пользователями", "Регистрация, аутентификация, хранение связанных данных")
+    Container(UsersDatabase, "Users Database", "PostgreSQL", "Хранение данных пользователей")
+}
+
+  Container_Boundary(Heating, "Heating"){
+    Container(HeatService, "Сервис управления отоплением", "Включение, выключение, контроль температуры")
+    Container(HeatDatabase, "Heating Database", "PostgreSQL", "Хранение данных отопительных приборов")
+}
+
+  Container_Boundary(Monitoring, "Monitoring"){
+    Container(HeatMonitoring, "Сервис мониторинга", "Мониторинг температуры")
+    Container(MonitoringDatabase, "Monitoring Database", "PostgreSQL", "Хранение данных температурных датчиков")
+  }
+
+ 
+
+  Container_Boundary(Video, "Video"){
+    Container(VideoService, "Сервис видеонаблюдения", "Видеонаблюдения")
+    Container(VideoDatabase, "Video Database", "PostgreSQL", "Хранение данных видеозаписей")
+  }
+
+
+
+  Container_Boundary(Gates, "Gates"){
+    Container(GatesService, "Сервис управления воротами", "Открытие, закрытие ворот")
+    Container(GatesDatabase, "Gates Database", "PostgreSQL", "Хранение данных о воротах")
+  }
+
+  Container_Boundary(Light, "Light"){
+    Container(LightService, "Сервис управления освещением", "Включение, выключение осветительных приборов")
+    Container(LightDatabase, "Light Database", "PostgreSQL", "Хранение данных освещения")
+  }
+
+
+
+}
+
+System_Ext(HeatingSystem, "Устройства отопления", "Управляемое оборудование")
+System_Ext(TemperatureSensor, "Телеметрия", "Датчики приборов")
+System_Ext(GatesSystem, "Ворота", "Приборы управление воротами")
+System_Ext(LightSystem, "Свет", "Приборы управление светом")
+System_Ext(VideoSystem, "Видеонаблюдением", "Система видеонаблюдения")
+
+Rel(UsersService, WebApp, "")
+Rel(UsersService, UsersDatabase,"")
+Rel(UsersDatabase,UsersService, "")
+Rel(WebApp, UsersService, "")
+
+Rel(user, WebApp, "Обращение к системе")
+Rel(WebApp, Kafka,"")
+Rel(Kafka, WebApp, "")
+
+Rel(HeatService, WebApp,"")
+Rel(HeatMonitoring,WebApp,"")
+Rel(GatesService,WebApp,"")
+Rel(LightService,WebApp,"")
+Rel(VideoService, WebApp,"")
+
+Rel(HeatService, Kafka,"")
+Rel(HeatService, HeatDatabase,"")
+Rel(HeatDatabase, HeatService,"")
+
+Rel(HeatMonitoring, Kafka,"")
+Rel(HeatMonitoring, MonitoringDatabase,"")
+Rel(MonitoringDatabase, HeatMonitoring,"")
+
+Rel(GatesService, Kafka,"")
+Rel(GatesService, GatesDatabase,"")
+Rel(GatesDatabase, GatesService,"")
+
+Rel(LightService, Kafka,"")
+Rel(LightService, LightDatabase,"")
+Rel(LightDatabase, LightService,"")
+
+Rel(VideoService, Kafka,"")
+Rel(VideoService, VideoDatabase,"")
+Rel(VideoDatabase, VideoService,"")
+
+
+Rel(WebApp, LightSystem, "")
+Rel(WebApp, VideoSystem,"")
+Rel( WebApp, GatesSystem,,"")
+Rel(TemperatureSensor, Monitoring,"")
+Rel(WebApp, HeatingSystem,"")
+@enduml

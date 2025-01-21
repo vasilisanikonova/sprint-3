@@ -1,0 +1,89 @@
+# Задание 1. Анализ и планирование
+
+Чтобы составить документ с описанием текущей архитектуры приложения, можно часть информации взять из описания компании условия задания. Это нормально.
+
+### 1. Описание функциональности монолитного приложения (AS-IS)
+
+**Управление отоплением:**
+
+- Пользователи могут:
+  - включать отопление;
+  - выключать отопление;
+- Система позволяет сохранять:
+  - состояние отопительных приборов;
+  - целевые и текущие показатели температуры;
+  - управлять состоянием приборов.
+
+**Мониторинг температуры:**
+
+- Пользователи могут получать данные о температуре в своих домах;
+- Система позволяет получать и сохранять данные о текущих значениях температуры и времени по каждому датчику.  
+
+### 2. Анализ архитектуры монолитного приложения
+
+**Язык программирования**
+Java
+
+**База данных**
+PostgreSQL
+
+**Архитектура системы**
+Монолитная, все компоненты системы (обработка запросов, бизнес-логика, работа с данными) находятся в рамках одного приложения
+
+**Взаимодецствие**
+Синхронное
+
+**Масштабируемость**
+Ограничена
+
+### 3. Определение доменов и границы контекстов (в текущем приложении)
+
+Определен один домен - "Управление устройствами", включающий в себя два поддомена:
+- Управление оборудованием;
+- Мониторинг температуры.
+
+### 4. Проблемы монолитного решения
+
+- Монолитная архитектура приложения была актуальна, пока компания занималась управлением отопления в одном доме и не требовалось масштабирование;
+- Для подключения новых устройств необходим выезд специалиста оффлайн, в текущем положении, когда предполагается подключение не только одного дома, а на территории нескольких поселков в разных регионах страны - это повлечет за собой, наприер, финансовые издержки;
+- Синхронное взаимодействие также является одной из проблем текущего решения, так как может повлечь за собой: например, если состояние системы перегружено, то время ответа системы - непрогнозируемо, также любая ошибка в цепочке повлечет за собой ряд других ошибок и/или потерю данных;
+- В системе присутствует явная связанность компонентов, что добавляет сложности к добавлению нового функционала в систему.
+
+
+### 5. Визуализация контекста системы — диаграмма С4
+
+```markdown
+[Ссылка на файл C4_context.puml](diagramms\C4_context.puml)
+
+[Ссылка в PlantUML на диаграмму C4 context](www.plantuml.com/plantuml/png/bPD1Inj15CVlyod6d29OUl5KIZ6DWWNRIcCFFONL37LXTwRCpaAb21eFKb8g58-bfVKBh371P4qsN-7DD-fxioOnTQDa5nppPkV__x_VlbsBZATD70RC-2OG7Fv25qPmOrlGvz2130Qqz221Atk4VmTu9nnIt1dQ9ZwSscDS4rw9NaMCBVboBuWRWZ-lhZwjhjQhIXhFbqA_O4jcNuI2xsdpn0jtXMPRbGzlt-_KjoflrclLolP6UPbj2nqfMOuZeLTu2Nv3Xb6-mJMkRKYS7_ukFR37xJ7qNAGk36ohgA7ICcEJNFMNAfODJn-KDuLdVFbnKuNYjP8gyCq--VoPoa5IBFU5SRmA9AcaLR2kGjmWiNCwW0h3PzoUmCWHRSCDLP1n5ulaXUKC-iwrxP3tSe_fLJk8Z0XTv5gyEzKdA1sy9ovmKU22svUGsIECqCdfvHimS6H_G8eDVhUdumCh7DgszNyLCHP4GdI-KHf1FXBi9sIaOvkK1FM6SCLppCYtIvaHn0c6R56eHHxFSnsoGvPdgczyDkEtcrT8yE8-QGH3-Z0Qix9dv7sNeJrpbja35D7_Zk-E23y9xPbOYvgGaN9pZKFaB925op0sEdTTdA9A2htvxR5t8hZzHkOCxI-uT6U-JjzvElDbK4mdCpj2ivImymLcj8YUyoYSYVjS9gaTrYOYI3YAPVGFND_IxS-diYPa8mw3Vm00)
+```
+
+# Задание 2. Проектирование микросервисной архитектуры
+
+
+**Диаграмма контейнеров (Containers)**
+```markdown
+[Ссылка на файл C4_containers.puml](diagramms\C4_containers.puml)
+
+[Ссылка в PlantUML на диаграмму C4 containers](www.plantuml.com/plantuml/png/f5PDRpCr4Bxlh_2RKoFrXKkF2041yGhUIeNmSQoSnAIhPdUZNQUYGaZze5HL414LHrGeY2DI4XgQ9itcBup_4UFPxCVYR9G4HOezO_kPcSSpitudaDoN7QTbILks18FVOGHpcAekF35uW12Uts3m5qmWLESmLkVg0ZSyGvzLzbZTSoMtNU47h67pfiyTnx9Us6wzrMa8zbPbxytAtc4btlIszK8U2KUmkYzVSgScVCiwmBEUkzC9XB_BIl0hX6Zw1tZ4SGXzieLoQSKQoxgbkki7K2fRrTD02cUdwY05hpn7H38QsmJ4IW8yVC_hk0tkdov190tJgbAPVMCnbfpQ-LBKtcstSGzE6CvQTfrBstDrr1_n4xxBgctVTfl4mYtQ7Ro4kJg3CKpHiNzGCSFv25t9edxClphcU69V105l2bRplMFXQmnQ8R2V42N4e4RgJDCOuc-WRXQ0JmX8Y4Pqd-Dj1NYUnb9PHvErJEggy4_ikj1MxZK-33LjJ5sIwtqKfv4TrMCmNtgrFIHuJ7x-XlBV4UtwiFfU7zjbEBkalJFy7wllqEb9kggkoD0ivaT7E4JGHrBEL5TTuTMc0l5dnF4-bxp60n67osA5Tkp02sJJ5zLFNfERV-ODvj0BWeGHyVnj0TEl19TuymY-c9biwuMDo0xHSWZpMANpU95P4_JlHtKTwv7WeUgQMbq5cdA4feZOeXZcP1e3mrivKrqCo_GqeJE9Q6j2aq36SIj8cARY64187WvNyBllkRRq_8ZYH2XWERivJpGyQqR8aP1ipp1T-nJ2B-RAkdobzZAi9SgjYLjgFga7KbnJ9KNKCQR9A-3l2xiXF3H8eyaQgGkIKmzeRaJyz66WiunaIjCe8rVkA2ypbc6AvAr9IjsZXZ7NFY-AbHWf8EH3BeLkZJIQX91weseTKjxeLEydxV0EfObE6Hof8id5Z2PppA29NCZGHFB_ACASYuikMbHkh-tcaKHC6arsIBrXByEUZhjkjkjbAS35EbraYRSP8adUbaWZ5DLBCmt_edV4uGTVo_YRaBvL_bXy5qDuqZD4wHjT7k5eQqgYwb4N28c5A4pa-27wE2KlYepTpuJJ5ZwN7On8k87dn--aAG6Do8VOqC-PFZ8skSm1KmQcuTocwHIz-zApghia3s1aLaaEdoucnR-FBdnTx2H1y0sOnwK64yd5tIgVb_Uv5_Jg5eZ6h4z5wp_FgUInYClcQlx9ajsJQhCdKfmOrrobvGwgCyRX3WQQgRJm64noBt7Add_RhACSW80O2CDNSnZUyER-4jBPViiZq_OdkvbE7_pcqS8zJnaO3cccrEgPTh2grggciQYneq1-lyTVG2BRf8B0q-gPJwuGCQia0bb88T8Ug5j8f1hBmfg1eIKGpLo86aPgpO2a1OY79qIDT41DlQqY85nXZMIwtzqDIilzxXONzSTGFItcn_P3MBPplOxz1W00)
+
+**Диаграмма компонентов (Components)**
+
+```markdown
+[Ссылка на файл C4_components.puml](diagramms\C4_components.puml)
+
+[Ссылка в PlantUML на диаграмму C4 components](www.plantuml.com/plantuml/png/dLVDRnD75B_xhnXy2b8-Bfnw0eBQq3fLYaLxH6FlOA_O3sjs38egf12Q8kIgKNkkg5gfnqgsMvV48Uj_OUO_wfitjj_WxB9nZCZE-_xulPdPlPifBbK_ZcegL95W-ayzqJDzOGRwdEb_TQu_R3FzjvxgtBpIP-QLEGQ53th8Tk-mtJJkfOb8LCQ2a7SaZ-DQxLQOjAD-8FeoObsbUjbdEpkIlzZkXAhRR_Kp8Tjfei1ekvt6Eu_2DfT1-dKeUYBQsRspTH3nH3tUR-p4F5D20kl9CinspoPwItL5B5XRgYqUjuIirGw4pD9am_hUP7NzkywXW9_qUtYEzH0p1hh-2HdpYpE3wxUXVhlMF8H4uutFGzK8dmf7GQZhkm1bS5FRXRRmC17ooVsqdmHS7bxnsOm1BBQNng9-ctrVO_1RMcry9rhtUhq86gh2D05jO32FO-DyoP_pJTRioJ3fO3z-XHn6MtfcZlIPle0a_mF69QmdzTiGmFq8w8rx1m-_u4gyu8TWJOIheK3V9GLIj_3qNgwa_nL_-eo3U5za6Uy8rfBfCo6j0KemsryWpHmwE3575h4S_etCstd6v-0OVHOqyZ6CHWOUyEbNHl5Hr1JoUTWMDjOVDeeUMwIOUOqT6W9vuQAPKwPdXRDq2fYUsMo1-iVXR4tDZzPeay7gDMfUccFW_029JqbgJZ3CvG84M-KONBwtJ30Pc1EO9IAebDN6Opa0qA9e1ciVfMA3VPv0x-NIA7QqP_Ioh7KFkE8jdecbxO9XenwacUf8qVocWPtvQwLAlwIIliB_y-NabEAy9xY2qOOOyrKnrbQu5jGv997hsO9bD-vy-qmXrP_DcmKV01wRGG4Njhs570SO3not-sSO6cg4gJWoWr8y5vKvH8aWICjjgD8vWpaE8dE_dq5Bien5QITibxfw8Am1ZOUZsPnH9qwck1ALSqCmBCU6igiU70B66nn2wMnnh2y4xdWRwHpRFwOvAXcZ_JG9LIhT915HFaoaipfFW340ZodbcCKbd0h3ClYjzMzN3TQU5ih73GpHbUT0KoHPQY5sYxe7J030i0pP5SXIF0zVOjxuR2Zg0nsBbl463rGVv1AClmq3aK90V1OZYwAISy8-8EG4mHhgaTtmIEDWkiEXN4DFoh73g0usN5OYXbfxq4LArHbQdh_NVMwxAu9-93xjbFQxCmrmZzErK2AecWwqyGO3wHlF1261r-JCmeEtHTKkj-yk6RZ7P_44e6YjcsBi3XaOrE7oHU0TK5ExOU69jm4cwd4yi_Avm5pSNE2oSYvGYo14qeVECOBG5dTDvD34GmxfcoENVzGlSr89MIFiT1NunMSnP2XQytA7bopGUbjmkL_hUYSNnzLtJoc-cBZ35vUL-3OUWXRXYqO-leuHY3NmHHCFNwHlZkzAPyqf0Gm_-Fj8HFFFjkM7WdwdHzOfmS7qzAFlCtjuegN_CU8-7-fpYQEOhr0lC791IURegtOef3VgAhUakJIcDpPArOdehYoKElBgVKeQk0UBJ16y0W7TCBxWhaY2VXpz3m00)
+
+
+**Диаграмма кода (Code)**
+ 
+[Ссылка на файл С4_code_heating.puml](diagramms\С4_code_heating.puml)
+
+[Ссылка в PlantUML на диаграмму C4 code heating](www.plantuml.com/plantuml/png/rL6_hzCm4DxzLzpRG4zvMPWOK54wC1IAACpeObzJIxOlEf-3AiJ_ZgCMQ4gGMDzcVpzqttUtoOgY9GQZNWF1EqBrQO03oUGjGSUEOEjn48p6A8-W33shSWJdXQnwJiOy-6H3SLGam4brpA_RLl3Rq-3rLFgIIImdfQHFbcFxoLiKnnyyZHJQxbNpCM3IB-ztRSIi91Nwsd4SESsESKxte2UA15QqmTYJ66C3vlmhx-5SVH6-6tZSSOtlNNtrp84mWS_xLB-EIny856KW_Knn944jGdyeMqGeBRWVguCwJYeS0iay4XwNAGRI1V3YvT-QCZfKMf5Dx1reaRHFzy3nU8Fask6-oONUNifKghllKnMrqMgbwy4lVRQe17F0-NDGgIf0gtxoUlwT09rxUyLkSWb5dcX9FBVr_ElMJVDcTMd_Rp1hzXNPXf8hCVm4)
+
+
+# Задание 3. Разработка ER-диаграммы
+
+[Ссылка на файл ER_diagramm.puml](diagramms\ER_diagramm.puml)
+
+[Ссылка в PlantUML на ER диаграмму](www.plantuml.com/plantuml/png/XPBDQjmm4CVlUeg9Zu6rM-XfJu6afT0FIfgSbrbhM0lqOQHnmX9wIAzzYzuBFRJGZv2-WlQDAZjhB7S3lUXZ_ZF_dsRiay3ekJDQi69DyFmSfCADHsCWVexVuv_uU_Sf_eJuBTx7knBYb_Whtkzkuu_TxUvZIhYBNuLWrm8xM3jcPvA3fvgLiq8SALlhJbBdDJJCRLXMbSVhSgEuwTPT85yxosIvh9sfpbMDNhgtYbhIrUcpnJkDbY_VlAuC1YQVGgjJPrfd-ugsV_OHDsG8QiyBD6loGYH9yHQAosHUm8q0E8OUj58Ibc2x8GjWiHYKnXbwK5wycaIBXfPmXRvkiB-JGQKXZxGOmhNpCWj-cDWlasjn8qRx39omZpq7fVGKminiT7k_3KnctqaOBWUzv1flMyhxoVkSXmCZTmcwTauJsWITCo-IqvxxE57IbQhfa3WPdGqP_pLYqcI8_NObaV6VrpFw3V6WZ9MG3-XYB4w4GyIUaIQhEyh3oI_Tpz8wc8d-Xu7YQP7oeNXIbiS5zDyHnB3EbVs0nCCsQcdB9YUcuxmu6ugOZdbECVKaJiZApkY_)
