@@ -11,9 +11,15 @@ Container_Boundary(SmartHomeSystem, "Smart Home") {
   Container(WebApp, "Web Application", "Java, Spring", "Веб-приложение")
   Container(Kafka, "Message broker", "Kafka", "Брокер сообщений")
 
+  Container_Boundary(Users, "Users"){
+    Container(UsersService, "Сервис управления пользователями", "Регистрация, аутентификация, хранение связанных данных")
+    Container(UsersDatabase, "Users Database", "PostgreSQL", "Хранение данных пользователей")
+}
+
   Container_Boundary(Heating, "Heating"){
     Container(HeatService, "Сервис управления отоплением", "Включение, выключение, контроль температуры")
     Container(HeatDatabase, "Heating Database", "PostgreSQL", "Хранение данных отопительных приборов")
+}
 
   Container_Boundary(Monitoring, "Monitoring"){
     Container(HeatMonitoring, "Сервис мониторинга", "Мониторинг температуры")
@@ -24,7 +30,7 @@ Container_Boundary(SmartHomeSystem, "Smart Home") {
 
   Container_Boundary(Video, "Video"){
     Container(VideoService, "Сервис видеонаблюдения", "Видеонаблюдения")
-    Container(VideoDatabase, "Video Database", "PostgreSQL", "Хранение данных записей")
+    Container(VideoDatabase, "Video Database", "PostgreSQL", "Хранение данных видеозаписей")
   }
 
 
@@ -43,13 +49,18 @@ Container_Boundary(SmartHomeSystem, "Smart Home") {
 
 }
 
-System_Ext(HeatingSystem, "Устройства отопления", "Управляемое отопительное оборудование")
+System_Ext(HeatingSystem, "Устройства отопления", "Управляемое оборудование")
 System_Ext(TemperatureSensor, "Телеметрия", "Датчики приборов")
 System_Ext(GatesSystem, "Ворота", "Приборы управление воротами")
 System_Ext(LightSystem, "Свет", "Приборы управление светом")
 System_Ext(VideoSystem, "Видеонаблюдением", "Система видеонаблюдения")
 
-Rel(user, WebApp, "Uses the system")
+Rel(UsersService, WebApp, "")
+Rel(UsersService, UsersDatabase,"")
+Rel(UsersDatabase,UsersService, "")
+Rel(WebApp, UsersService, "")
+
+Rel(user, WebApp, "Обращение к системе")
 Rel(WebApp, Kafka,"")
 Rel(Kafka, WebApp, "")
 
@@ -83,6 +94,6 @@ Rel(VideoDatabase, VideoService,"")
 Rel(WebApp, LightSystem, "")
 Rel(WebApp, VideoSystem,"")
 Rel( WebApp, GatesSystem,,"")
-Rel(TemperatureSensor, WebApp,"")
+Rel(TemperatureSensor, Monitoring,"")
 Rel(WebApp, HeatingSystem,"")
 @enduml
